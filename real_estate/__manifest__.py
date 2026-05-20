@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 {
-    'name': "real_estate",
+    'name': "Real Estate",
 
     'summary': "Short (1 phrase/line) summary of the module's purpose",
 
@@ -8,7 +8,7 @@
 Long description of module's purpose
     """,
 
-    'author': "My Company",
+    'author': "Alaa mohamed",
     'website': "https://www.yourcompany.com",
 
     # Categories can be used to filter modules in modules listing
