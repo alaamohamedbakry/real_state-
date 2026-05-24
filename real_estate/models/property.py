@@ -13,3 +13,6 @@ class Property(models.Model):
     
     # === FINANCIAL FIELDS ===
     price = fields.Float(string='Monthly Rent', required=True)
+    deposit_required = fields.Float(string = 'Sequrity Deposit')
+    
+    
