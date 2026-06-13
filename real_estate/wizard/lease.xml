@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_lease_request_wizard_form" model="ir.ui.view">
+        <field name="name">lease.request.wizard.view.form</field>
+        <field name="model">lease.request.wizard</field>
+        <field name="arch" type="xml">
+            <form string="Lease Request">
+                <group>
+                    <group>
+                        <field name="lease_id" readonly="1" />
+                        <field name="property_id"/>
+                        <field name="tenant_id"/>
+                    </group>
+                    <group>
+                        <field name="new_start_date"/>
+                        <field name="new_end_date"/>
+                    </group>
+                    <group>
+                        <field name="monthly_rent"/>
+                        <field name="deposit_paid"/>
+                        <field name="note"/>
+                    </group>
+                </group>
+                <footer>
+                    <button name="action_review_lease" string="Submit Request" type="object" class="oe_highlight"/>
+                    <button string="Cancel" special="cancel" class="btn btn-danger"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+    <record id="action_lease_request_wizard" model="ir.actions.act_window">
+        <field name="name">Lease Request</field>
+        <field name="res_model">lease.request.wizard</field>
+        <field name="view_mode">form</field>
+        <field name="target">new</field>
+    </record>
+</odoo>

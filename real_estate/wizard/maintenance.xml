@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- Wizard View -->
+    <record id="view_maintenance_request_wizard_form" model="ir.ui.view">
+        <field name="name">maintenance.request.wizard.form</field>
+        <field name="model">maintenance.request.wizard</field>
+        <field name="arch" type="xml">
+            <form string="Maintenance Request">
+                <group>
+                    <group>
+                        <field name="lease_id" readonly="1" />
+                        <field name="property_id"/>
+                    </group>
+                    <group>
+                        <field name="issue_type"/>
+                        <field name="urgency"/>
+                    </group>
+                </group>
+                <group>
+                    <group>
+                        <field name="preferred_date"/>
+                    </group>
+                    <group>
+                        <field name="tenant_phone"/>
+                    </group>
+                </group>
+                <group string="Description of Issue">
+                    <field name="description" placeholder="Describe the issue in detail..."/>
+                </group>
+                <footer>
+                    <button name="action_submit_request" string="Submit Request" type="object" class="oe_highlight"/>
+                    <button string="Cancel" class="btn-secondary" special="cancel"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_maintenance_request_wizard" model="ir.actions.act_window">
+        <field name="name">Maintenance Request</field>
+        <field name="res_model">maintenance.request.wizard</field>
+        <field name="view_mode">form</field>
+        <field name="target">new</field>
+    </record>
+
+</odoo>
+

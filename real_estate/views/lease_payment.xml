@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_lease_payment_tree" model="ir.ui.view">
+        <field name="name">lease.payment.tree</field>
+        <field name="model">lease.payment</field>
+        <field name="arch" type="xml">
+            <tree string="Lease Payments" decoration-success="state == 'paid'" decoration-info="state == 'draft'" decoration-warning="state =='pending'">
+                <field name="name"/>
+                <field name="lease_id"/>
+                <field name="tenant_id"/>
+                <field name="due_date"/>
+                <field name="amount"/>
+                <field name="user_id"/>
+                <field name="state" widget="badge" decoration-success="state == 'paid'" decoration-info="state == 'draft'"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="view_lease_payment_form" model="ir.ui.view">
+        <field name="name">lease.payment.form</field>
+        <field name="model">lease.payment</field>
+        <field name="arch" type="xml">
+            <form string="Lease Payment">
+                <header>
+                    <field name="state" widget="statusbar" statusbar_visible="draft,pending,paid"/>
+                    <button name="confirm_payment" type="object" string="Paid" class="btn-primary"/>
+                    <button name="%(real_estate.action_payment_tenant_wizard)d" string="Change Tenant" type="action" context="{'default_lease_id': lease_id}" class="btn-primary"/>          
+            
+
+                </header>
+                <sheet>
+                    <div class="oe_title">
+                        <h1><field name="name" readonly="1"/></h1>
+                    </div>
+                    <group>
+                        <group string="Lease Information">
+                            <field name="lease_id"/>
+                            <field name="tenant_id"/>
+                            <field name="property_id"/>
+                            <field name="user_id"/>
+                        </group>
+                        <group string="Payment Details">
+                            <field name="due_date"/>
+                            <field name="amount"/>
+                            <field name="late_fee" invisible="late_fee_applied != True"/>
+                            <field name="late_fee_applied"/>
+                            <field name="total_amount"/>
+                            <field name="payment_date"/>
+                            <field name="payment_method"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Notes">
+                            <field name="notes" placeholder="Add internal notes..."/>
+                        </page>
+                    </notebook>
+                </sheet>
+                <div class="oe_chatter">
+                    <field name="message_follower_ids"/>
+                    <field name="activity_ids"/>
+                    <field name="message_ids"/>
+                </div>
+            </form>
+        </field>
+    </record>
+
+</odoo>

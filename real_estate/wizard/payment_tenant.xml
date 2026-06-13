@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_payment_tenant_wizard_form" model="ir.ui.view">
+        <field name="name">payment.tenant.wizard.view.form</field>
+        <field name="model">payment.tenant.wizard</field>
+        <field name="arch" type="xml">
+            <form string="">
+                <sheet>
+                    <group string= "Change Tenant">
+                        <field name="tenant_id"/>
+                        
+                        
+                    </group>
+                    <footer>
+                        <button name="change_tenant" string="Submit Change" type="object" class="oe_highlight"/>
+                        <button string="Cancel" class="btn-secondary" special="cancel"/>
+                    </footer>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_payment_tenant_wizard" model="ir.actions.act_window">
+        <field name="name">Payment Tenant</field>
+        <field name="res_model">payment.tenant.wizard</field>
+        <field name="view_mode">form</field>
+        <field name="target">new</field>
+    </record>
+</odoo>

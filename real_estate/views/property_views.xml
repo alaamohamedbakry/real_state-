@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_property_tree" model="ir.ui.view">
+        <field name="name">real_estate.property.tree</field>
+        <field name="model">real_estate.property</field>
+        <field name="arch" type="xml">
+     
+            <tree string="Properties">
+                <field name="name"/>
+                <field name="description"/>
+                <field name="price"/>
+                <field name="agent_id"/>
+                <field name="bed_rooms"/>
+                <field name="bath_rooms"/>
+                <field name="floor"/>
+                <field name="address"/>
+                <field name="city"/>
+                <field name="property_type"/>
+                <field name="available"/>
+                
+            </tree>
+        </field>
+    </record>
+
+    <record id="model_name_view_form" model="ir.ui.view">
+        <field name="name">real_estate.property.form</field>
+        <field name="model">real_estate.property</field>
+        <field name="arch" type="xml">
+            <form string="Property">
+            <header>
+                <button name="mark_as_available" type="object" string="Mark as Available" class="oe_highlight"/>
+                <button name="mark_as_unavailable" type="object" string="Mark as Unavailable" class="btn-danger"/>
+                <button name="make_default_price" type="object" string="Change Monthly Rent" class="oe_highlight"/>
+                <button name="add_price" type="object" string="Add Price" class="oe_highlight" invisible="price > 1000"/>
+                <button name="get_available_properties" type="object" string="Get Available Properties" class="oe_highlight"/>
+                <button name="get_customer_data" type="object" string="Update Description" class="oe_highlight"/>
+            </header>
+    <sheet>
+
+       <div class="oe_title">
+          <field name="image_property"
+               widget="image"
+               class="oe_avatar"/>
+
+           <label for="name"/>
+             <h1>
+               <field name="name"
+                   placeholder="Enter Your Property Name"/>
+             </h1>
+        </div>
+
+        <group>
+            <group>
+              <field name="price"/>
+              <field name="description"/>
+           </group>
+
+           <group>
+               <field name="address"/>
+               <field name="city"/>
+              <field name="property_type"/>
+           </group>
+
+           <group string="Agent Details">
+               <field name="agent_id"/>
+              <field name="deposit_required"/>
+           </group>
+
+          <group string="Property Details">
+               <field name="bed_rooms"/>
+               <field name="bath_rooms"/>
+               <field name="floor"/>
+               <field name="available"/>
+          </group>
+     </group>
+                  <notebook>
+                        <page string="Description">
+                            <field name="description"/>
+                        </page>
+                        <page string="Leases" >
+                            <field name="lease_ids">
+                                <tree editable="bottom"  create="false" delete="false">
+                                    <field name="name"/>
+                                    <field name="tenant_id"/>
+                                    <field name="start_date"/>
+                                    <field name="end_date"/>
+                                </tree>
+                            </field>                                
+                        </page>
+                    </notebook>
+
+    </sheet>
+   </form>
+  </field>
+ </record>
+</odoo>

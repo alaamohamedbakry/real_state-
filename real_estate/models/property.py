@@ -10,9 +10,118 @@ class Property(models.Model):
     name = fields.Char(string='Property Name', required=True, index=True)
     description = fields.Text(string='Description')
     agent_id = fields.Many2one('res.users', string='Agent', default=lambda self: self.env.user, index=True)
+    image_property = fields.Image('Image Property', max_width=1970, max_height=1970)
+    
     
     # === FINANCIAL FIELDS ===
     price = fields.Float(string='Monthly Rent', required=True)
     deposit_required = fields.Float(string = 'Sequrity Deposit')
     
+    #===  Property Details ===
+
+    bed_rooms = fields.Integer('Bedrooms')
+    bath_rooms = fields.Integer('Bathrooms')
+    floor = fields.Integer('Floor')
+    address = fields.Char(string='Address')
+    city = fields.Char(string='City')
+    property_type = fields.Selection([
+        ('villa', 'Villa'),
+        ('apartment','Apartment')
+    ], string='Property Type')   
+    available = fields.Boolean('Available',default = True , index = True)
+
+
+
+    lease_ids = fields.One2many('real_estate.lease', 'property_id', string='Leases')
+
+
+
+
+
+
+
+
+
+
+
+    def mark_as_available(self):
+        """mark property as available"""
+        for rec in self:
+         rec.write({'available' : True , 'price' : 0})
+
+    def mark_as_unavailable(self):
+        """mark property as unavailable"""
+        for rec in self:
+         rec.write({'available' : False})
+
+    def make_default_price(self):
+       for rec in self:
+          rec.write({'price' : 3000})
+
+    def add_price(self):
+       for rec in self:
+          if rec.available == False:
+           rec.write({'price':rec.price + 1000})
+    
+    def get_available_properties(self):
+        #  avilable_pro = self.search([('available','=',True)])
+        #  for pro in avilable_pro :  
+        #      print(pro.name)
+        avilable_property = self.env['crm.lead'].search([
+           ('expected_revenue','>',1000)
+           ])
+        print(avilable_property.mapped('name'))
+
+
+           
+    def write(self, values):
+        
+        if not self.env.user.has_group('real_estate.group_property_manager'):
+            raise ValidationError("you do not have access")
+        values['available'] = True
+        result = super(Property, self).write(values)
+            
+    
+        return result 
+        
+           
+
+
+    # def get_data_for_desc(self):
+    #    avilable_property = self.env['crm.lead'].search(['|',
+    #        ('expected_revenue','>',1000),
+    #        ('email_from','!=',False)
+    #        ])
+    #    res = (avilable_property.mapped('name'))
+
+    #    self.write({'description':res})
+
+    # def get_won_for_desc(self):
+    #    won_available = self.env['crm.lead'].search([
+    #        ('stage_id.id','=',4)
+    #     ])
+    #    res = (won_available.mapped('name'))
+
+    #    self.write({'description':res})
+
+    def get_customer_data(self):
+       customer_data = self.env['crm.lead'].search([
+           ('partner_id.email','!=',False)
+        ])
+
+       self.write({'description':customer_data.mapped('user_id.name')})
+
+    
+       
+       
+        
+
+        
+
+
+       
+       
+
+    
+
     

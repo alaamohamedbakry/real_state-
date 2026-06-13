@@ -17,17 +17,35 @@ Long description of module's purpose
     'version': '0.1',
 
     # any module necessary for this one to work correctly
-    'depends': ['base','hr'],
+    'depends': ['base','crm'],
 
     # always loaded
     'data': [
-        # 'security/ir.model.access.csv',
+       'security/property_security.xml',
+       'security/maintenance_security.xml',
+       'security/ir.model.access.csv',
+        'data/name_sequence.xml',
+        'views/menu.xml',
+        'wizard/maintenance.xml',
+        'wizard/lease.xml',
+        'wizard/payment_request.xml',
+        'wizard/payment_tenant.xml',
+        'views/lease_payment.xml',
+        'views/property_views.xml',
+        'views/tenant_views.xml',
+        'views/lease_views.xml',
+        'views/maintenance_views.xml',
         'views/views.xml',
         'views/templates.xml',
+        
+        
+        
+
     ],
     # only loaded in demonstration mode
     'demo': [
         'demo/demo.xml',
     ],
+   
 }
 

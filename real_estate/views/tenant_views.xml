@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    
+    <record id="view_real_estate_tenant_tree" model="ir.ui.view">
+        <field name="name">real_estate.tenant.tree</field>
+        <field name="model">real_estate.tenant</field>
+        <field name="arch" type="xml">
+            <tree string="Tenants">
+                <field name="name"/>
+                <field name="email"/>
+                <field name="phone"/>
+                <field name="city"/>
+                <field name="date_joined"/>
+                <field name="active"/>
+                <field name="user_id"/>
+                <field name="date_of_birth"/>
+                <field name="notes"/>
+            </tree>
+        </field>
+    </record>
+
+   
+    <record id="real_estate_tenant_form" model="ir.ui.view">
+        <field name="name">real_estate.view.form</field>
+        <field name="model">real_estate.tenant</field>
+        <field name="arch" type="xml">
+            <form string="Tenants">
+                <sheet>
+                    <div class="oe_title">
+                        <label for="name"/>
+                        <h1>
+                            <field name="name" placeholder="Enter your tenant name"/>
+                        </h1>
+                    </div>
+                    <group string="Tenant Details">
+                        <group>
+                            <field name="email"/>
+                            <field name="phone"/>
+                        </group>
+                        <group>
+                            <field name="mobile"/>
+                            <field name="city"/>
+                            <field name="date_of_birth"/>
+                        </group>
+                        <group>
+                            <field name="date_joined"/>
+                            <field name="active"/>
+                            <field name="user_id"/>
+                            <field name="notes"/>
+                        </group>
+                    </group>
+
+                  <notebook>
+                        <page string="Notes">
+                            <field name="notes"/>
+                        </page>
+                        <page string="Leases">
+                            <field name="lease_ids">
+                                <tree editable="bottom">
+                                    <field name="name"/>
+                                    <field name="property_id"/>
+                                    <field name="start_date"/>
+                                    <field name="end_date"/>
+                                </tree>
+                            </field>                                
+                        </page>
+                    </notebook>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+</odoo>

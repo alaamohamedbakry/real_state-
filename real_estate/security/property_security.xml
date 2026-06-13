@@ -1,0 +1,66 @@
+<odoo>
+    <record id="group_agent" model="res.groups">
+        <field name="name">Real Estate Agent</field>
+    </record>
+
+    <record id="group_property_manager" model="res.groups">
+        <field name="name">Property Manager</field>
+        <field name="implied_ids" eval="[(4, ref('group_agent'))]"/>
+    </record>
+
+    <record id="group_tenant" model="res.groups">
+        <field name="name">Tenant</field>
+    </record>
+    <record id="group_tenant_manager" model="res.groups">
+        <field name="name">Tenant Manager</field>
+        <field name="implied_ids" eval="[(4, ref('group_tenant'))]"/>
+    </record>
+
+    <record id="property_agent_rule" model="ir.rule">
+        <field name="name">Agent: Own Properties Only</field>
+        <field name="model_id" ref="model_real_estate_property"/>
+        <field name="domain_force">[('agent_id', '=', user.id)]</field>
+        <field name="groups" eval="[(4, ref('group_agent'))]"/>
+    </record>
+
+    <record id="property_agent_manager_rule" model="ir.rule">
+        <field name="name">Mnager: All Properties </field>
+        <field name="model_id" ref="model_real_estate_property"/>
+        <field name="domain_force">[(1,'=',1)]</field>
+        <field name="groups" eval="[(4, ref('group_property_manager'))]"/>
+    </record>
+
+    <record id="tenant_user_rule" model="ir.rule">
+        <field name="name">Tenant: Own Tenants Only</field>
+        <field name="model_id" ref="model_real_estate_tenant"/>
+        <field name="domain_force">[('user_id', '=', user.id)]</field>
+        <field name="groups" eval="[(4, ref('group_tenant'))]"/>
+    </record>
+
+
+    <record id="tenant_manager_rule" model="ir.rule">
+        <field name="name">Manager: All tenants </field>
+        <field name="model_id" ref="model_real_estate_tenant"/>
+        <field name="domain_force">[(1,'=',1)]</field>
+        <field name="groups" eval="[(4, ref('group_tenant_manager'))]"/>
+    </record>
+
+    <record id="user_leases_rule" model="ir.rule">
+        <field name="name">Lease: All users </field>
+        <field name="model_id" ref="model_real_estate_lease"/>
+        <field name="domain_force">[('created_by', '=', user.id)]</field>
+    </record>
+
+     <record id="user_leases_rule" model="ir.rule">
+        <field name="name">Lease: All users </field>
+        <field name="model_id" ref="model_real_estate_lease"/>
+        <field name="domain_force">[(1, '=', 1)]</field>
+         <field name="groups" eval="[(4, ref('group_property_manager'))]"/>
+
+    </record>
+
+
+   
+
+
+</odoo>

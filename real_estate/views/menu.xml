@@ -1,0 +1,126 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Main Menu (Top Level) -->
+    <menuitem id="menu_real_estate_root"
+              name="Real Estate"
+              sequence="530"/>
+
+
+              <!--Property Action-->   
+
+    <record id="action_property" model="ir.actions.act_window">
+        <field name="name">Properties</field>
+        <field name="res_model">real_estate.property</field>
+        <field name="view_mode">tree,form</field>
+      <field name="help" type="html">
+       <div style="text-align:center;">
+         <img src="/real_estate/static/src/img/logo.jpeg"
+             width="150"
+             height="150"/>
+
+         <p>no data here please create a new property</p>
+       </div>
+      </field>
+    </record>
+
+    <!-- Properties Menu -->
+    <menuitem id="menu_property"
+              name="Properties"
+              parent="menu_real_estate_root"
+              action="action_property"
+              sequence="10"/>
+
+       <!--Tenant Action-->       
+    
+    <record id="action_tenant" model="ir.actions.act_window">
+        <field name="name">tenants</field>
+        <field name="res_model">real_estate.tenant</field>
+        <field name="view_mode">tree,form</field>
+      <field name="help" type="html">
+       <div style="text-align:center;">
+         <img src="/real_estate/static/src/img/2.jpg"
+             width="150"
+             height="150"/>
+
+         <p>no data here please create a new tenant</p>
+       </div>
+      </field>
+    </record>
+
+
+    <!-- tenant Menu -->
+    <menuitem id="menu_tenant"
+              name="tenants"
+              parent="menu_real_estate_root"
+              action="action_tenant"
+              sequence="20"/>
+
+              <!--Lease Action-->   
+
+      <record id="action_lease" model="ir.actions.act_window">
+        <field name="name">lease</field>
+        <field name="res_model">real_estate.lease</field>
+        <field name="view_mode">tree,form</field>
+        <field name="help" type="html">
+           <p class="o_view_nocontent_smiling_face">
+              Create your first lease
+           </p>
+        </field>
+     </record>
+
+        <!--Lease Menu-->   
+
+     <menuitem id="menu_lease"
+              name="lease"
+              parent="menu_real_estate_root"
+              action="action_lease"
+              sequence="30"/>
+
+
+                 <!--Maintenance Action-->   
+
+      <record id="action_maintenance" model="ir.actions.act_window">
+        <field name="name">Maintenance</field>
+        <field name="res_model">maintenance.request</field>
+        <field name="view_mode">tree,form</field>
+        <field name="help" type="html">
+           <p class="o_view_nocontent_smiling_face">
+              Create your first maintenance
+           </p>
+        </field>
+     </record>
+
+        <!--Maintenance Menu-->   
+
+     <menuitem id="menu_maintenance"
+              name="maintenance"
+              parent="menu_real_estate_root"
+              action="action_maintenance"
+              sequence="40"/>
+
+  <!--Lease payment Action-->   
+
+ <record id="action_lease_payment" model="ir.actions.act_window">
+        <field name="name"> payment</field>
+        <field name="res_model">lease.payment</field>
+        <field name="view_mode">tree,form</field>
+        <field name="help" type="html">
+           <p class="o_view_nocontent_smiling_face">
+              Create your first Lease
+           </p>
+        </field>
+     </record>
+
+        <!--lease payment Menu-->   
+
+     <menuitem id="menu_lease_payment"
+              name=" payment"
+              parent="menu_real_estate_root"
+              action="action_lease_payment"
+              sequence="40"/>
+
+
+
+    
+
+</odoo>
