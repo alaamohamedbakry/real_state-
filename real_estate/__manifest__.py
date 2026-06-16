@@ -17,7 +17,7 @@ Long description of module's purpose
     'version': '0.1',
 
     # any module necessary for this one to work correctly
-    'depends': ['base','crm'],
+    'depends': ['base','crm','sale'],
 
     # always loaded
     'data': [
@@ -25,11 +25,14 @@ Long description of module's purpose
        'security/maintenance_security.xml',
        'security/ir.model.access.csv',
         'data/name_sequence.xml',
+        'data/mail_template_data.xml',
         'views/menu.xml',
         'wizard/maintenance.xml',
         'wizard/lease.xml',
         'wizard/payment_request.xml',
         'wizard/payment_tenant.xml',
+        'views/crm_lead_view.xml',
+        'views/sale_order_view.xml',
         'views/lease_payment.xml',
         'views/property_views.xml',
         'views/tenant_views.xml',

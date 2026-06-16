@@ -4,6 +4,7 @@ from odoo.exceptions import ValidationError, AccessError
 class Property(models.Model):
     _name = 'real_estate.property'
     _description = 'Real Estate Property'
+    _inherit = ["mail.thread", "mail.activity.mixin"]
     _order = 'name asc'
     
     # === CORE FIELDS ===
@@ -25,9 +26,11 @@ class Property(models.Model):
     address = fields.Char(string='Address')
     city = fields.Char(string='City')
     property_type = fields.Selection([
+        ('apartment', 'Apartment'),
+        ('house', 'House'),
         ('villa', 'Villa'),
-        ('apartment','Apartment')
-    ], string='Property Type')   
+        ('commercial', 'Commercial'),
+    ], string='Property Type', required=True)    
     available = fields.Boolean('Available',default = True , index = True)
 
 
@@ -40,7 +43,27 @@ class Property(models.Model):
 
 
 
-
+    def notify_agent_if_state_available(self):
+        """Send payment reminder based on type"""
+        template_xml_id =  'real_estate.email_template_send_notify'
+        if not template_xml_id:
+            return
+            
+        template = self.env.ref(template_xml_id, raise_if_not_found=False)
+        if not template:
+            return
+            
+        for property in self:
+            if not property.agent_id.email:
+                property.message_post(body="Could not send reminder: Agent has no email.")
+                continue
+            if not property.available:
+                property.message_post(body="Could not send reminder:Property is Not Available.")
+            #     continue
+            # Send the email
+            template.send_mail(property.id, force_send=True)
+            
+            
 
 
 
@@ -74,15 +97,15 @@ class Property(models.Model):
 
 
            
-    def write(self, values):
+    # def write(self, values):
         
-        if not self.env.user.has_group('real_estate.group_property_manager'):
-            raise ValidationError("you do not have access")
-        values['available'] = True
-        result = super(Property, self).write(values)
+    #     if not self.env.user.has_group('real_estate.group_property_manager'):
+    #         raise ValidationError("you do not have access")
+    #     values['available'] = True
+    #     result = super(Property, self).write(values)
             
     
-        return result 
+    #     return result 
         
            
 

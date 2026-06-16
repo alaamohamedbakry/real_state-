@@ -1,0 +1,168 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="0">
+        <!-- Upcoming Payment Reminder -->
+        <record id="email_template_payment_upcoming" model="mail.template">
+            <field name="name">Lease: Upcoming Payment Reminder</field>
+            <field name="model_id" ref="real_estate.model_real_estate_lease"/>
+            <field name="subject">Upcoming Rent Payment for {{ object.property_id.name }}</field>
+            <field name="email_from">{{ (object.property_id.agent_id.email_formatted or user.email_formatted) }}</field>
+            <field name="email_to">{{ object.tenant_id.email }}</field>
+            <field name="body_html" type="html">
+                <div style="margin: 0px; padding: 0px;">
+                    <p style="margin: 0px; padding: 0px; font-size: 13px;">
+                        Dear
+                        <t t-out="object.tenant_id.name"/>,
+                        <br/>
+                        <br/>
+                        This is a friendly reminder that your rent payment for
+                        <strong>
+                            <t t-out="object.property_id.name"/>
+                        </strong> 
+                        is due on
+                        <strong>
+                            <t t-out="object.next_payment_date"/>
+                        </strong>.
+                        <br/>
+                        <br/>
+                        Amount Due:
+                        <strong>
+                            <t t-out="object.monthly_rent"/>
+                        </strong>
+                        <br/>
+                        <br/>
+                        Please ensure the payment is made by the due date to avoid any late fees.
+                        <br/>
+                        <br/>
+                        Best regards,
+                        <br/>
+                        <t t-out="object.property_id.agent_id.name or 'Real Estate Management'"/>
+                    </p>
+                </div>
+            </field>
+            <field name="auto_delete" eval="True"/>
+        </record>
+        <record id="email_template_payment_due" model="mail.template">
+            <field name="name">Lease: Due today Payment Reminder</field>
+            <field name="model_id" ref="real_estate.model_real_estate_lease"/>
+            <field name="subject">Due today Rent Payment for {{ object.property_id.name }}</field>
+            <field name="email_from">{{ (object.tenant_id.email  or user.email_formatted) }}</field>
+            <field name="email_to">{{ object.tenant_id.email }}</field>
+            <field name="body_html" type="html">
+                <div style="margin: 0px; padding: 0px;">
+                    <p style="margin: 0px; padding: 0px; font-size: 13px;">
+                        Dear
+                        <t t-out="object.tenant_id.name"/>,
+                        <br/>
+                        <br/>
+                        This is a friendly reminder that your rent payment for
+                        <strong>
+                            <t t-out="object.property_id.name"/>
+                        </strong> 
+                        is due on
+                        <strong>
+                            <t t-out="object.next_payment_date"/>
+                        </strong>.
+                        <br/>
+                        <br/>
+                        Amount Due:
+                        <strong>
+                            <t t-out="object.monthly_rent"/>
+                        </strong>
+                        <br/>
+                        <br/>
+                        Deposit paid is :
+                        <strong>
+                            <t t-out="object.deposit_paid"/>
+                        </strong>
+                        <br/>
+                        <br/>
+                        Please ensure the payment is made by the due date to avoid any late fees.
+                        <br/>
+                        <br/>
+                        Best regards,
+                        <br/>
+                        <t t-out="object.property_id.agent_id.name or 'Real Estate Management'"/>
+                    </p>
+                </div>
+            </field>
+            <field name="auto_delete" eval="True"/>
+        </record>
+        <record id="email_template_send_notify" model="mail.template">
+            <field name="name">Property: Due today Payment Reminder</field>
+            <field name="model_id" ref="real_estate.model_real_estate_property"/>
+            <field name="subject">Due today Rent Payment for {{ object.name }}</field>
+            <field name="email_from">{{ (object.agent_id.email_formatted or user.email_formatted) }}</field>
+            <field name="email_to">{{ object.agent_id.email }}</field>
+            <field name="body_html" type="html">
+                <div style="margin: 0px; padding: 0px;">
+                    <p style="margin: 0px; padding: 0px; font-size: 13px;">
+                        Dear
+                        <t t-out="object.agent_id.name"/>,
+                        <br/>
+                        <br/>
+                       the property
+                        <strong>
+                            <t t-out="object.name"/>
+                        </strong>is available now
+                        <br/>
+                        <br/>
+                        Best regards,
+                        <br/>
+                        <t t-out="object.agent_id.name or 'Real Estate Management'"/>
+                    </p>
+                </div>
+            </field>
+            <field name="auto_delete" eval="True"/>
+        </record>
+        <record id="email_template_send_email_to_tenant" model="mail.template">
+            <field name="name">Send email to tenant</field>
+            <field name="model_id" ref="real_estate.model_real_estate_lease"/>
+            <field name="subject">Sending Email for {{ object.tenant_id.name }}</field>
+            <field name="email_from">{{ (object.tenant_id.email or user.email_formatted) }}</field>
+            <field name="email_to">{{ object.tenant_id.email }}</field>
+            <field name="body_html" type="html">
+                <div style="margin: 0px; padding: 0px;">
+                    <p style="margin: 0px; padding: 0px; font-size: 13px;">
+                        Dear
+                        <t t-out="object.tenant_id.name"/>,
+                        <br/>
+                        <br/>
+                        This is a friendly reminder that your rent payment for
+                        <strong>
+                            <t t-out="object.property_id.name"/>
+                        </strong> 
+                        Your lease number:
+                        <strong>
+                            <t t-out="object.name"/>
+                        </strong>is expired
+                        <br/>
+                        <br/>
+                        Best regards,
+                        <br/>
+                        <t t-out="object.property_id.agent_id.name or 'Real Estate Management'"/>
+                    </p>
+                </div>
+            </field>
+            <field name="auto_delete" eval="True"/>
+        </record>
+        <record id="ir_cron_create_tenant_from_lead" model="ir.cron">
+            <field name="name">Create Tenant From Lead</field>
+            <field name="model_id" ref="crm.model_crm_lead"/>
+            <field name="state">code</field>
+            <field name="code">model._cron_auto_create_tenant()</field>
+            <field name="interval_number">1</field>
+            <field name="interval_type">hours</field>
+            <field name="numbercall">-1</field>
+        </record>
+        <!-- <record id="ir_cron_create_lease_from_expired_status" model="ir.cron">
+            <field name="name">Create Lead from expired status</field>
+            <field name="model_id" ref="leads.model_real_estate.lead"/>
+            <field name="state">code</field>
+            <field name="code">model._cron_auto_create_leases_from_state_expired()</field>
+            <field name="interval_number">1</field>
+            <field name="interval_type">hours</field>
+            <field name="numbercall">-1</field>
+        </record> -->
+    </data>
+</odoo>

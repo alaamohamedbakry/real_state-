@@ -34,6 +34,7 @@ class Lease(models.Model):
     # === LEASE TERMS ===
     start_date = fields.Date(string="Start Date", required=True)
     end_date = fields.Date(string="End Date", required=True)
+    next_payment_date = fields.Date()
     monthly_rent = fields.Float(string="Monthly Rent", required=True)
     deposit_paid = fields.Float(string="Deposit Paid")
     currency_id = fields.Many2one(
@@ -42,6 +43,7 @@ class Lease(models.Model):
         default=lambda self: self.env.company.currency_id,
     )
     created_by = fields.Many2one("res.users", string="Created By", index=True)
+    last_reminder_sent = fields.Date(string='Last Reminder Sent', readonly=True)
 
     # === STATUS ===
     state = fields.Selection(
@@ -67,6 +69,105 @@ class Lease(models.Model):
     total_rent = fields.Float(
         string="Total Rent", compute="_compute_total_rent", store=True
     )
+
+
+    def send_reminder_email(self, reminder_type='due_today'):
+        """Send payment reminder based on type"""
+        template_mapping = {
+            'upcoming': 'real_estate.email_template_payment_upcoming',
+            'due_today': 'real_estate.email_template_payment_due',
+            'overdue_warning': 'real_estate.email_template_payment_overdue',
+        }
+        
+        template_xml_id = template_mapping.get(reminder_type)
+        if not template_xml_id:
+            return
+            
+        template = self.env.ref(template_xml_id, raise_if_not_found=False)
+        if not template:
+            return
+            
+        for lease in self:
+            if not lease.tenant_id.email:
+                lease.message_post(body="Could not send reminder: Tenant has no email.")
+                continue
+            # if not lease.next_payment_date:
+            #     lease.message_post(body="Could not send reminder: No upcoming payment date found.")
+            #     continue
+            # Send the email
+            template.send_mail(lease.id, force_send=True)
+            
+            # Log in chatter
+            reminder_label = reminder_type.replace('_', ' ').capitalize()
+            lease.message_post(body=f"Sent {reminder_label} reminder to {lease.tenant_id.email}")
+            
+            # Update last_reminder_sent field
+            lease.last_reminder_sent = fields.Date.today()
+
+
+
+    def send_email_to_tenant(self):
+        """Send payment reminder based on type"""
+      
+        
+        template_xml_id = 'real_estate.email_template_send_email_to_tenant'
+        if not template_xml_id:
+            return
+            
+        template = self.env.ref(template_xml_id, raise_if_not_found=False)
+        if not template:
+            return
+            
+        for lease in self:
+            if not lease.tenant_id.email:
+                lease.message_post(body="Could not send reminder: Tenant has no email.")
+                continue
+            # if not lease.next_payment_date:
+            #     lease.message_post(body="Could not send reminder: No upcoming payment date found.")
+            #     continue
+            # Send the email
+            template.send_mail(lease.id, force_send=True)
+        
+            
+            # Update last_reminder_sent field
+            lease.last_reminder_sent = fields.Date.today()
+
+
+    def _cron_auto_expire_leases(self):
+        """Scheduled action - expire leases whose end date has passed"""
+        today = fields.Date.today()
+        expired_leases = self.search([
+            ('end_date', '<', today),
+        ])
+        for lease in expired_leases:
+            lease.write({'state': 'expired'})
+            lease.send_email_to_tenant()
+
+
+
+    def _cron_auto_create_leases_from_state_expired(self):
+        """Scheduled action - expire leases whose end date has passed"""
+        for lease in expired_leases:
+             today = fields.Date.today()
+             expired_leases = self.search([
+            ('end_date', '<', today),
+             ('state','=','expired')
+            ])
+             lease.create({
+                'property_id': self.property_id.id,
+                'tenant_id': self.tenant_id.id,
+                'start_date': self.new_start_date,
+                'end_date': self.new_end_date,
+                'deposit_paid': self.deposit_paid,
+                'monthly_rent':self.monthly_rent,
+                'note': self.note,
+                'state': 'active'     
+            })
+         
+
+  
+
+
 
     def set_active(self):
         for rec in self:

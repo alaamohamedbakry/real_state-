@@ -18,14 +18,15 @@ class LeaseRequestWizard(models.TransientModel):
         string="Start Date", required=True, default=fields.Date.today
     )
     new_end_date = fields.Date(string="End Date", required=True)
-    deposit_paid = fields.Float(string="Deposit Paid")
+    deposit_paid = fields.Float(string="Deposit Paid",related='lease_id.deposit_paid')
     note = fields.Text("Note")
-    monthly_rent = fields.Float(string='Monthly Rent', required=True)
+    monthly_rent = fields.Float(string='Monthly Rent', related='lease_id.monthly_rent')
 
 
     def action_review_lease(self):
 
         self.ensure_one()
+        lease_request =  self.lease_id.state = 'expired'
 
         lease_request = self.env["real_estate.lease"].create(
             {
@@ -36,9 +37,10 @@ class LeaseRequestWizard(models.TransientModel):
                 'deposit_paid': self.deposit_paid,
                 'monthly_rent':self.monthly_rent,
                 'note': self.note,
-                'state': 'expired'
+                'state': 'active'
             }
         )
+
 
     @api.constrains('new_start_date')
     def _check_start_date(self):

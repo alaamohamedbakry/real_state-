@@ -23,6 +23,12 @@ class Tenant(models.Model):
     # === ADDITIONAL INFO ===
     notes = fields.Text(string='Notes')
     active = fields.Boolean(string='Active', default=True)
+    property_type = fields.Selection([
+        ('apartment', 'Apartment'),
+        ('house', 'House'),
+        ('villa', 'Villa'),
+        ('commercial', 'Commercial'),
+    ], string='Property Type', required=True)    
 
 
     lease_ids = fields.One2many('real_estate.lease', 'tenant_id', string='Leases1')
@@ -42,7 +48,10 @@ class Tenant(models.Model):
       if  self.env.user.id != self.user_id.id and not self.env.user.has_group('real_estate.group_tenant_manager'):
          raise ValidationError("you do not have access")
       return super().write(values)
-     
+    
+
+
+   
 
 
      
