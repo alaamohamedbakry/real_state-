@@ -43,7 +43,7 @@ class LeasePayment(models.Model):
         for vals in vals_list:
         
             if vals.get('name', 'New') == 'New':
-                vals['name'] = self.env['ir.sequence'].next_by_code('code.lease_payment') or "New"   
+                vals['name'] = self.env['ir.sequence'].next_by_code('lease.payment') or "New"   
                 
         return super().create(vals_list)   
 

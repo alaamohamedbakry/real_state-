@@ -31,6 +31,8 @@ class Lease(models.Model):
         index=True,
     )
 
+    maintenance_ids = fields.One2many('maintenance.request', 'lease_id', string='maintenance')
+
     # === LEASE TERMS ===
     start_date = fields.Date(string="Start Date", required=True)
     end_date = fields.Date(string="End Date", required=True)
@@ -43,7 +45,7 @@ class Lease(models.Model):
         default=lambda self: self.env.company.currency_id,
     )
     created_by = fields.Many2one("res.users", string="Created By", index=True)
-    last_reminder_sent = fields.Date(string='Last Reminder Sent', readonly=True)
+    last_reminder_sent = fields.Date(string="Last Reminder Sent", readonly=True)
 
     # === STATUS ===
     state = fields.Selection(
@@ -61,122 +63,88 @@ class Lease(models.Model):
     )
 
     # === COMPUTED FIELDS ===
-
     duration_months = fields.Integer(
         string="Duration (months)", compute="_compute_duration", store=True
     )
-    # is_active = fields.Boolean(string = "Currency Active" , compute = '_compute_is_active')
     total_rent = fields.Float(
         string="Total Rent", compute="_compute_total_rent", store=True
     )
 
-
-    def send_reminder_email(self, reminder_type='due_today'):
+    def send_reminder_email(self, reminder_type="due_today"):
         """Send payment reminder based on type"""
         template_mapping = {
-            'upcoming': 'real_estate.email_template_payment_upcoming',
-            'due_today': 'real_estate.email_template_payment_due',
-            'overdue_warning': 'real_estate.email_template_payment_overdue',
+            "upcoming": "real_estate.email_template_payment_upcoming",
+            "due_today": "real_estate.email_template_payment_due",
+            "overdue_warning": "real_estate.email_template_payment_overdue",
         }
-        
+
         template_xml_id = template_mapping.get(reminder_type)
         if not template_xml_id:
             return
-            
+
         template = self.env.ref(template_xml_id, raise_if_not_found=False)
         if not template:
             return
-            
+
         for lease in self:
             if not lease.tenant_id.email:
                 lease.message_post(body="Could not send reminder: Tenant has no email.")
                 continue
-            # if not lease.next_payment_date:
-            #     lease.message_post(body="Could not send reminder: No upcoming payment date found.")
-            #     continue
-            # Send the email
             template.send_mail(lease.id, force_send=True)
-            
-            # Log in chatter
-            reminder_label = reminder_type.replace('_', ' ').capitalize()
-            lease.message_post(body=f"Sent {reminder_label} reminder to {lease.tenant_id.email}")
-            
-            # Update last_reminder_sent field
+
+            reminder_label = reminder_type.replace("_", " ").capitalize()
+            lease.message_post(
+                body=f"Sent {reminder_label} reminder to {lease.tenant_id.email}"
+            )
             lease.last_reminder_sent = fields.Date.today()
-
-
 
     def send_email_to_tenant(self):
         """Send payment reminder based on type"""
-      
-        
-        template_xml_id = 'real_estate.email_template_send_email_to_tenant'
+        template_xml_id = "real_estate.email_template_send_email_to_tenant"
         if not template_xml_id:
             return
-            
+
         template = self.env.ref(template_xml_id, raise_if_not_found=False)
         if not template:
             return
-            
+
         for lease in self:
             if not lease.tenant_id.email:
                 lease.message_post(body="Could not send reminder: Tenant has no email.")
                 continue
-            # if not lease.next_payment_date:
-            #     lease.message_post(body="Could not send reminder: No upcoming payment date found.")
-            #     continue
-            # Send the email
             template.send_mail(lease.id, force_send=True)
-        
-            
-            # Update last_reminder_sent field
             lease.last_reminder_sent = fields.Date.today()
-
 
     def _cron_auto_expire_leases(self):
         """Scheduled action - expire leases whose end date has passed"""
         today = fields.Date.today()
-        expired_leases = self.search([
-            ('end_date', '<', today),
-        ])
+        expired_leases = self.search([("end_date", "<", today)])
         for lease in expired_leases:
-            lease.write({'state': 'expired'})
+            lease.write({"state": "expired"})
             lease.send_email_to_tenant()
-
-
 
     def _cron_auto_create_leases_from_state_expired(self):
         """Scheduled action - expire leases whose end date has passed"""
+        today = fields.Date.today()
+        expired_leases = self.search([("end_date", "<", today), ("state", "=", "expired")])
         for lease in expired_leases:
-             today = fields.Date.today()
-             expired_leases = self.search([
-            ('end_date', '<', today),
-             ('state','=','expired')
-            ])
-             lease.create({
-                'property_id': self.property_id.id,
-                'tenant_id': self.tenant_id.id,
-                'start_date': self.new_start_date,
-                'end_date': self.new_end_date,
-                'deposit_paid': self.deposit_paid,
-                'monthly_rent':self.monthly_rent,
-                'note': self.note,
-                'state': 'active'     
+            lease.create({
+                "property_id": lease.property_id.id,
+                "tenant_id": lease.tenant_id.id,
+                "start_date": lease.start_date,
+                "end_date": lease.end_date,
+                "deposit_paid": lease.deposit_paid,
+                "monthly_rent": lease.monthly_rent,
+                "note": lease.note,
+                "state": "active",
             })
-         
-
-  
-
-
 
     def set_active(self):
         for rec in self:
-
             rec.write({"state": "active"})
 
     def set_draft(self):
         for rec in self:
-
             rec.write({"state": "draft"})
 
     def set_at_risk(self):
@@ -184,175 +152,48 @@ class Lease(models.Model):
             for rec in self:
                 rec.write({"state": "at_risk"})
         else:
-            raise ValidationError("you don not have  access")
+            raise ValidationError("you do not have access")
 
     def set_expired(self):
         for rec in self:
-
             rec.write({"state": "expired"})
 
     def get_property_data(self):
-
         for rec in self:
-            rec.write(
-                {
-                    "note": str(rec.property_id.price)
-                    + " "
-                    + rec.tenant_id.name
-                    + " "
-                    + str(rec.tenant_id.phone)
-                }
-            )
+            rec.write({
+                "note": str(rec.property_id.price)
+                + " "
+                + rec.tenant_id.name
+                + " "
+                + str(rec.tenant_id.phone)
+            })
 
     @api.model_create_multi
     def create(self, vals_list):
         for vals in vals_list:
             if vals.get("name", "New") == "New":
-                vals["name"] = self.env["ir.sequence"].next_by_code(
-                    "real_estate.lease"
-                )
-
-            return super().create(vals_list)
+                vals["name"] = self.env["ir.sequence"].next_by_code("real_estate.lease")
+        return super().create(vals_list)
 
     def maintenance_request(self):
         for rec in self:
             print("maintenance")
 
-    # #=== Computed Methods ===
-    # @api.depends('start_date','end_date')
-    # #=== calculate duration in months ===
+    def action_export_excel(self):
+        return {
+            'type': 'ir.actions.act_url',
+            'url': f'/real_estate/lease/excel_export/{self.id}',
+            'target': 'self',
+        }
 
-    # def _compute_duration(self):
+    def action_export_excel_server_action(self):
+        active_ids = self.env.context.get("active_ids",  self.ids)
+        return {
+            'type': 'ir.actions.act_url',
+            'url': f'/real_estate/lease/server_report?lease_ids={active_ids}',
+            'target': 'new',
+        }
 
-    #   for record in self:
-
-    #     if record.start_date and record.end_date:
-    #       delta = record.end_date - record.start_date
-    #       record.duration_months = int(delta.days/30)
-
-    #     else:
-    #       record.duration_months = 0
-
-    # @api.depends('start_date','end_date')
-    # def _compute_is_active(self):
-    #   today = fields.Date.today()
-    #   # === Check lease is  currently active ===
-    #   for record in self:
-    #     if  record.start_date and record.end_date:
-    #       record.is_active = record.start_date <= today <= record.end_date
-    #       record.state = 'active'
-    #     else:
-    #       record.is_active = False
-
-    # @api.depends('start_date','note')
-
-    # def _compute_note(self):
-    #    today = fields.Date.today()
-
-    #    for record in self:
-    #      if record.start_date:
-    #         update =   record.start_date - today
-    #         record.write({'note':update})
-    #      else:
-    #        record.note = False
-
-    # @api.depends('duration_months','monthly_rent')
-
-    # def _compute_total_rent(self):
-    #   for rec in self:
-    #     rec.total_rent = rec.monthly_rent * rec.duration_months
-
-    # @api.constrains('start_date','end_date')
-
-    # def date_validation(self):
-    #   for dat in self:
-    #     if dat.end_date < dat.start_date:
-    #       raise ValidationError("the start date must be before end date")
-
-    # @api.onchange('start_date', 'end_date')
-    # def auto_date_correction(self):
-    #   for rec in self:
-    #     if rec.start_date and rec.end_date:
-    #         if rec.end_date <= rec.start_date:
-    #             rec.end_date = rec.start_date + timedelta(days=1)
-
-    # @api.constrains('deposit_paid','monthly_rent')
-    # def deposit_validate(self):
-    #   for rec in self:
-    #     if rec.deposit_paid <= 0:
-    #       raise ValidationError("the deposit must be bigger than 0")
-    #     if rec.deposit_paid != rec.monthly_rent:
-    #       raise ValidationError("the deposit must be equal month rent")
-
-    # @api.constrains('property_id')
-    # def name_validation(self):
-    #   for lead in self:
-    #     if lead.property_id:
-
-    #      valdiate = self.env['crm.lead'].search([
-    #     ('name','=',lead.property_id.name)
-    #     ])
-
-    #      if valdiate:
-    #        raise ValidationError(f"There is already a CRM Lead with the name '{lead.property_id.name}'")
-
-    # @api.constrains('property_id')
-
-    # def property_validation(self):
-    #   if self.property_id and not self.property_id.available:
-    #     raise ValidationError("Property id not available")
-
-    # @api.constrains('property_id', 'tenant_id')
-    # def check_tenant_validate(self):
-    #  for lease in self:
-    #     checking = self.search([
-    #         ('property_id', '=', lease.property_id.id),
-    #         ('tenant_id', '=', lease.tenant_id.id),
-    #         ('id', '!=', lease.id),
-    #     ])
-
-    #     if checking:
-    #         raise ValidationError(
-    #             "This tenant already has a lease for this property."
-    #         )
-    # @api.constrains('tenant_id')
-    # def check_tenant_phone(self):
-    #    for rec in self:
-    #      if not rec.tenant_id.phone:
-    #        raise ValidationError("the tenant phone does not exist")
-
-    # @api.constrains('property_id', 'start_date', 'end_date')
-    # def _check_overlapping_leases(self):
-    #     for lease in self:
-    #         # Search for OTHER leases on the SAME property
-    #         overlapping = self.search([
-    #             ('property_id', '=', lease.property_id.id),
-    #             ('id', '!=', lease.id),  # Exclude the current lease
-    #             ('state', 'in', ['draft', 'active']),  # Only check active/draft leases
-    #             ('start_date', '<=', lease.end_date),
-    #             ('end_date', '>=', lease.start_date),
-    #         ])
-    #         print("overlapping:", overlapping)
-    #         if overlapping:
-    #             raise ValidationError(
-    #                 f"Property '{lease.property_id.name}' is already leased from "
-    #                 f"{overlapping[0].start_date} to {overlapping[0].end_date}. "
-    #                 f"id is: {overlapping[0].id}"
-    #                 f"Cannot create overlapping lease."
-    #             )
-
-    # @api.onchange('tenant_id')
-    # def _onchange_property(self):
-    #   properties = self.env['real_estate.property'].search([
-    #       ('available', '=', True)
-    #      ])
-
-    #   return {
-    #     'domain': {
-    #         'property_id': [('id', 'in', properties.ids)]
-    #     }
-    #   }
-
-    # def write(self,vals):
-    #  if self.state not in 'draft':
-    #    raise ValidationError("you can not change in this stage")
+    def action_print_lease_as_pdf(self):
+        self.ensure_one()
+        return self.env.ref('real_estate.action_report_lease_summary').report_action(self)

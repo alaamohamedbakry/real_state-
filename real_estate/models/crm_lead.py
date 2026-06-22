@@ -3,6 +3,7 @@ from odoo.exceptions import ValidationError
 class CrmLead(models.Model):
     _inherit="crm.lead"
     tenant_created = fields.Boolean('tenant_created')
+    created_from_api = fields.Boolean(default=False)
 
     property_type = fields.Selection([
         ('apartment', 'Apartment'),

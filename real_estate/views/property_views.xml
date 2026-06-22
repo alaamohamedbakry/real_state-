@@ -16,6 +16,7 @@
                 <field name="city"/>
                 <field name="property_type"/>
                 <field name="available"/>
+                <field name="created_from_api"/>
             </tree>
         </field>
     </record>
@@ -30,6 +31,7 @@
                 <field name="agent_id"/>
                 <separator/>
                 <filter string="Available" name="available" domain="[('available','=',True)]"/>
+                <filter string="Created from Api" name="created_from_api" domain="[('created_from_api','=',True)]"/>
                 <separator/>
                 <group expand="0" string="Group By">
                     <filter string="Type" name="group_by_type" context="{'group_by': 'property_type'}"/>
@@ -50,6 +52,8 @@
                     <button name="get_available_properties" type="object" string="Get Available Properties" class="oe_highlight"/>
                     <button name="get_customer_data" type="object" string="Update Description" class="oe_highlight"/>
                     <button name="notify_agent_if_state_available" type="object" string="Send Mail To Agent" class="oe_highlight"/>
+                    <button name="action_export_excel" type="object" string="Download Excel report" class="oe_highlight"/>
+                    <button name="action_print_property_summary" type="object" string="Print report" class="oe_highlight"/>
                 </header>
                 <sheet>
                     <div class="oe_title">
@@ -81,6 +85,7 @@
                             <field name="bath_rooms"/>
                             <field name="floor"/>
                             <field name="available"/>
+                            <field name="lead_id"/>
                         </group>
                     </group>
                     <notebook>
@@ -107,4 +112,17 @@
             </form>
         </field>
     </record>
+
+    <record id="action_report_property_summary" model="ir.actions.report">
+        <field name="name">Property Summary</field>
+        <field name="model">real_estate.property</field>
+        <field name="report_type">qweb-pdf</field>
+        <field name="report_name">real_estate.report_property_summary</field>
+        <field name="report_file">real_estate.report_property_summary</field>
+        <field name="binding_model_id" ref="model_real_estate_property"/>
+        <field name="binding_type">report</field>
+        <field name="print_report_name">'Property Summary - %s' % (object.name)</field>
+    </record>
+
+    
 </odoo>

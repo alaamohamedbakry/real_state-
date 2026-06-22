@@ -12,6 +12,8 @@
         <field name="name">Properties</field>
         <field name="res_model">real_estate.property</field>
         <field name="view_mode">tree,form</field>
+         <field name="context">{"search_default_available":1}</field>
+
       <field name="help" type="html">
        <div style="text-align:center;">
          <img src="/real_estate/static/src/img/logo.jpeg"

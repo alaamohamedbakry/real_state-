@@ -38,8 +38,12 @@ Long description of module's purpose
         'views/tenant_views.xml',
         'views/lease_views.xml',
         'views/maintenance_views.xml',
+        'views/portal_templates.xml',
         'views/views.xml',
         'views/templates.xml',
+        'reports/lease_report_templates.xml',
+        'reports/property_report_templates.xml',
+
         
         
         

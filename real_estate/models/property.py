@@ -12,11 +12,16 @@ class Property(models.Model):
     description = fields.Text(string='Description')
     agent_id = fields.Many2one('res.users', string='Agent', default=lambda self: self.env.user, index=True)
     image_property = fields.Image('Image Property', max_width=1970, max_height=1970)
+    total_amount = fields.Float(string='Total Amount')
+
+
     
     
     # === FINANCIAL FIELDS ===
     price = fields.Float(string='Monthly Rent', required=True)
     deposit_required = fields.Float(string = 'Sequrity Deposit')
+    created_date = fields.Date(string='Created Date', default=fields.Date.today, readonly=True)
+
     
     #===  Property Details ===
 
@@ -32,10 +37,14 @@ class Property(models.Model):
         ('commercial', 'Commercial'),
     ], string='Property Type', required=True)    
     available = fields.Boolean('Available',default = True , index = True)
+    created_from_api = fields.Boolean(default=False,readonly=True)
 
 
 
     lease_ids = fields.One2many('real_estate.lease', 'property_id', string='Leases')
+    
+    lead_id = fields.Many2one('crm.lead',string='lead_id')
+    
 
 
 
@@ -95,6 +104,21 @@ class Property(models.Model):
            ])
         print(avilable_property.mapped('name'))
 
+
+
+    def action_export_excel(self):
+        return {
+            'type': 'ir.actions.act_url',
+            'url': f'/real_estate/property/excel_export/{self.id}',
+            'target': 'self',
+        }
+    
+
+    def action_print_property_summary(self):
+        self.ensure_one()
+        return self.env.ref('real_estate.action_report_property_summary').report_action(self)
+
+    
 
            
     # def write(self, values):

@@ -6,6 +6,10 @@
     <field name="model">real_estate.lease</field>
     <field name="arch" type="xml">
       <tree string="Lease">
+      <header>
+        <button name= "action_export_excel_server_action"  string= "Download Excel As server Action " type= "object"   />
+
+      </header>
         <field name="name"/>
         <field name="property_id"/>
         <field name="tenant_id"/>
@@ -17,7 +21,7 @@
       </tree>
     </field>
   </record>
-               <!--Lease Search view-->
+  <!--Lease Search view-->
   <record id="view_lease_search" model="ir.ui.view">
     <field name="name">real_estate.lease.search</field>
     <field name="model">real_estate.lease</field>
@@ -55,6 +59,8 @@
           <button name= "get_property_data"  string= "Get DATA Price Property" type= "object"  class="oe_highlight" />
           <button name= "send_reminder_email"  string= "Send Reminder due date" type= "object"  class="oe_highlight" />
           <button name= "send_reminder_email"  string= "Send Reminder " type= "object"  class="oe_highlight" />
+          <button name= "action_export_excel"  string= "Download Excel " type= "object"  class="oe_highlight" />
+          <button name= "action_print_lease_as_pdf"  string= "Print as Pdf " type= "object"  class="btn btn-success" />
           <button name= "%(real_estate.action_maintenance_request_wizard)d"  string= "Maintenance Request" type= "action" context="{'default_lease_id': active_id} "  invisible="state  in ['draft','at_risk','expired']"/>
           <button name= "%(real_estate.action_lease_request_wizard)d"  string= "Create New Lease" type= "action" context="{'default_lease_id': active_id} "  invisible="state  in ['draft','at_risk','expired']"/>
           <button name="%(real_estate.action_payment_request_wizard)d" string="Payment Reques" type="action" context="{'default_lease_id': active_id}" class="btn-primary"/>
@@ -112,4 +118,19 @@
     <field name="doall" eval="False"/>
     <field name="active" eval="True"/>
   </record>
+  
+  <record id="action_report_lease_summary" model="ir.actions.report">
+    <field name="name">Name</field>
+    <field name="model">real_estate.lease</field>
+    <field name="report_type">qweb-pdf</field>
+    <field name="report_name">real_estate.report_lease_summary</field>
+    <field name="report_file">real_estate.report_lease_summary</field>
+    <field name="print_report_name">'lease Pdf - %s' % (object.name)</field>
+    <field name="binding_model_id" ref="model_real_estate_lease"/>
+    <field name="binding_type">report</field>
+  </record>
+
+
+
+  
 </odoo>

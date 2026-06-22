@@ -7,31 +7,31 @@
             </function>
             <value eval="{'noupdate': False}" />
         </function>
-
-         <record id="seq_real_estate_lease" model="ir.sequence">
+        <record id="seq_real_estate_lease" model="ir.sequence">
             <field name="name">Name Sequence</field>
             <field name="code">real_estate.lease</field>
             <field name="prefix">Lease</field>
             <field name="padding">3</field>
             <field name="number_increment">1</field>
         </record>
-
-
         <function name="write" model="ir.model.data">
             <function name="search" model="ir.model.data">
                 <value eval="[('module', '=', 'real_estate'), ('name', '=', 'seq_real_estate_lease')]" />
             </function>
             <value eval="{'noupdate': True}" />
         </function>
-
-
-
-
         <record id="seq_real_estate_maintenance" model="ir.sequence">
             <field name="name">Name Sequence</field>
             <field name="code">real_estate.maintenance</field>
             <field name="prefix">REF/NO/</field>
             <field name="padding">3</field>
+            <field name="number_increment">1</field>
+        </record>
+        <record id="lease_payment_sequence" model="ir.sequence">
+            <field name="name">Payment Sequence</field>
+            <field name="code">lease.payment</field>
+            <field name="prefix">Pay/REF/</field>
+            <field name="padding">4</field>
             <field name="number_increment">1</field>
         </record>
     </data>
