@@ -6,10 +6,9 @@
     <field name="model">real_estate.lease</field>
     <field name="arch" type="xml">
       <tree string="Lease">
-      <header>
-        <button name= "action_export_excel_server_action"  string= "Download Excel As server Action " type= "object"   />
-
-      </header>
+        <header>
+          <button name= "action_export_excel_server_action"  string= "Download Excel As server Action " type= "object"   />
+        </header>
         <field name="name"/>
         <field name="property_id"/>
         <field name="tenant_id"/>
@@ -118,7 +117,6 @@
     <field name="doall" eval="False"/>
     <field name="active" eval="True"/>
   </record>
-  
   <record id="action_report_lease_summary" model="ir.actions.report">
     <field name="name">Name</field>
     <field name="model">real_estate.lease</field>
@@ -130,7 +128,4 @@
     <field name="binding_type">report</field>
   </record>
 
-
-
-  
 </odoo>

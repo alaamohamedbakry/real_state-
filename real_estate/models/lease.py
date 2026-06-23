@@ -70,6 +70,8 @@ class Lease(models.Model):
         string="Total Rent", compute="_compute_total_rent", store=True
     )
 
+    
+
     def send_reminder_email(self, reminder_type="due_today"):
         """Send payment reminder based on type"""
         template_mapping = {

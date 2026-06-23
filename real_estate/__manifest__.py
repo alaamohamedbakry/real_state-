@@ -26,6 +26,7 @@ Long description of module's purpose
        'security/ir.model.access.csv',
         'data/name_sequence.xml',
         'data/mail_template_data.xml',
+        'data/demo.xml',
         'views/menu.xml',
         'wizard/maintenance.xml',
         'wizard/lease.xml',
@@ -51,7 +52,6 @@ Long description of module's purpose
     ],
     # only loaded in demonstration mode
     'demo': [
-        'demo/demo.xml',
     ],
    
 }

@@ -2,13 +2,14 @@ from odoo import http, fields
 from odoo.http import request
 from functools import wraps
 import json
+import odoo
 
 
 class RealEstateAPI(http.Controller):
 
 
     
-    @http.route('/api/properties/create', type='json', auth='public', methods=['POST'], csrf=False)
+    @http.route('/api/properties/create', type='json', auth='user', methods=['POST'], csrf=False)
     def create_property(self, **kwargs):
         try:
             params = kwargs
@@ -372,6 +373,59 @@ class RealEstateAPI(http.Controller):
                 'count': len(data),
                 'data': data
             }
+            
+        except Exception as e:
+            return {
+                'status': 'error',
+                'message': str(e)
+            }
+
+
+    @http.route('/api/login', type='json', auth='public', methods=['POST'], csrf=False)
+    def login(self, **kwargs):
+        """
+        POST http://localhost:8017/api/login
+        Body: {
+            "db": "your_db",
+            "login": "admin",
+            "password": "admin"
+        }
+        """
+        try:
+            params = kwargs.get('params', kwargs) if kwargs else {}
+            db = params.get('db') or request.db
+            login = params.get('login')
+            password = params.get('password')
+
+            if not db or not login or password is None:
+                return {
+                    'status': 'error',
+                    'message': 'db, login and password are required'
+                }
+
+            request.session.authenticate(db, login, password)
+            if request.session.uid is None:
+                return {
+                    'status': 'error',
+                    'message': 'Authentication failed'
+                }
+            print("request.session.uid:", request.session.uid)
+            request.session.db = db
+            registry = odoo.modules.registry.Registry(db)
+            with registry.cursor() as cr:
+                # env = odoo.api.Environment(cr, request.session.uid, request.session.context)
+                # if not request.db:
+                #     http.root.session_store.rotate(request.session, env)
+                #     request.future_response.set_cookie(
+                #         'session_id', request.session.sid,
+                #         max_age=http.get_session_max_inactivity(env), httponly=True
+                #     )
+                # print("session_id:", request.session.sid)
+                return {
+                    'status': 'success',
+                    'session_id': request.session.sid
+                    # 'data': env['ir.http'].session_info()
+                }
             
         except Exception as e:
             return {

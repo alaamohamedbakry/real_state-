@@ -20,7 +20,7 @@
             </tree>
         </field>
     </record>
-    <!--Lease Search view-->
+    <!--property Search view-->
     <record id="view_property_search" model="ir.ui.view">
         <field name="name">real_estate.property.search</field>
         <field name="model">real_estate.property</field>
@@ -56,6 +56,16 @@
                     <button name="action_print_property_summary" type="object" string="Print report" class="oe_highlight"/>
                 </header>
                 <sheet>
+                    <div class="oe_button_box" name="button_box">
+                        <button name="action_view_leases"
+                type="object"
+                class="oe_stat_button"
+                icon="fa-file-text-o">
+                            <field name="lease_count"
+                   string="Leases"
+                   widget="statinfo"/>
+                        </button>
+                    </div>
                     <div class="oe_title">
                         <field name="image_property"
                widget="image"
@@ -112,7 +122,6 @@
             </form>
         </field>
     </record>
-
     <record id="action_report_property_summary" model="ir.actions.report">
         <field name="name">Property Summary</field>
         <field name="model">real_estate.property</field>
@@ -123,6 +132,4 @@
         <field name="binding_type">report</field>
         <field name="print_report_name">'Property Summary - %s' % (object.name)</field>
     </record>
-
-    
 </odoo>
