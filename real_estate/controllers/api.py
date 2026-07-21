@@ -1,9 +1,51 @@
+import odoo
 from odoo import http, fields
 from odoo.http import request
-from functools import wraps
 import json
-import odoo
+from functools import wraps
 
+
+def validate_token(func):
+    """Decorator to validate API token"""
+    @wraps(func)
+    def wrapper(*args, **kwargs):
+        token = request.httprequest.headers.get('Authorization')
+        
+        if not token:
+            return {
+                'status': 'error',
+                'message': 'Missing authorization token'
+            }
+        print("token:", token)
+        # Remove 'Bearer ' prefix if present
+        if token.startswith('Bearer '):
+            token = token[7:]
+        
+        # Validate token
+        token_obj = request.env['api.token'].sudo().search([
+            ('token', '=', token),
+            ('active', '=', True)
+        ], limit=1)
+        print("token_obj:", token_obj)
+        if not token_obj:
+            return {
+                'status': 'error',
+                'message': 'Invalid or expired token'
+            }
+        
+        # Check expiry
+        if token_obj.expiry_date and token_obj.expiry_date < fields.Date.today():
+            return {
+                'status': 'error',
+                'message': 'Token expired'
+            }
+        
+        # Set user context
+        request.env.uid = token_obj.user_id.id
+        
+        return func(*args, **kwargs)
+    
+    return wrapper
 
 class RealEstateAPI(http.Controller):
 
